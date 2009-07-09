@@ -15,6 +15,7 @@ SYNOPSIS
           run \@cmd, '<', "in.txt", \&out, \&err or die "cat: $?"
           run \@cat, '<', "in.txt", '>>', "out.txt", '2>>', "err.txt";
 
+
           # Redirecting using psuedo-terminals instad of pipes.
           run \@cat, '<pty<', \$in,  '>pty>', \$out_and_err;
 
@@ -409,7 +410,7 @@ DESCRIPTION
     processes are also specified:
 
        run io( "infile", ">", \$in ), io( "outfile", "<", \$in );
-      
+
     as can IPC::Run::Timer objects:
 
        run \@cmd, io( "outfile", "<", \$in ), timeout( 10 );
@@ -485,7 +486,7 @@ DESCRIPTION
     leading '|' consumes descriptor 0, so this works as expected.
 
        run \@cmd1, \$in, '|', \@cmd2, \$out;
-   
+
     The parameter following a redirection operator can be a scalar ref, a
     subroutine ref, a file name, an open filehandle, or a closed filehandle.
 
@@ -666,7 +667,7 @@ PSEUDO TERMINALS
 
        <pipe, N<pipe     P   Pipe opens H for caller to read, write, close.
        >pipe, N>pipe     P   Pipe opens H for caller to read, write, close.
-                      
+
     'N' and 'M' are placeholders for integer file descriptor numbers. The
     terms 'input' and 'output' are from the child process's perspective.
 
@@ -714,7 +715,7 @@ PSEUDO TERMINALS
 
            run \@a, *IN;      ## INVALID
            run \@a, '<', *IN; ## BUGGY: Reads file named like "*main::A"
-   
+
         because perl passes a scalar containing a string that looks like
         "*main::A" to &run, and &run can't tell the difference between that
         and a redirection operator or a file name. &run guarantees that any
@@ -1185,6 +1186,7 @@ ROUTINES
         kill all the children. Call "<$h-"kill_kill>> in this case if you
         care. This differs from the behavior of "run".
 
+    result
            $h->result;
 
         Returns the first non-zero result code (ie $? >> 8). See
@@ -1700,7 +1702,7 @@ AUTHORS
     Barrie Slaymaker <barries@slaysys.com>
 
 COPYRIGHT
-    Some parts copyright 2008 Adam Kennedy.
+    Some parts copyright 2008 - 2009 Adam Kennedy.
 
     Copyright 1999 Barrie Slaymaker.
 

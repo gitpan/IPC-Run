@@ -83,7 +83,7 @@ use IPC::Run qw( Win32_MODE );
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.82';
+	$VERSION = '0.83';
 	if ( Win32_MODE ) {
 		eval "use IPC::Run::Win32Helper; require IPC::Run::Win32IO; 1"
 		or ( $@ && die ) or die "$!";
@@ -220,6 +220,10 @@ sub _new_internal {
    return $self;
 }
 
+=pod
+
+=over
+
 =item filename
 
 Gets/sets the filename.  Returns the value after the name change, if
@@ -232,6 +236,8 @@ sub filename {
    $self->{FILENAME} = shift if @_;
    return $self->{FILENAME};
 }
+
+=pod
 
 =item init
 

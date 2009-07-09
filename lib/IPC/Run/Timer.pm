@@ -163,7 +163,7 @@ use Symbol;
 use Exporter;
 use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
 BEGIN {
-	$VERSION   = '0.82';
+	$VERSION   = '0.83';
 	@ISA       = qw( Exporter );
 	@EXPORT_OK = qw(
 		check
@@ -674,6 +674,8 @@ sub state {
 1;
 
 =pod
+
+=back
 
 =head1 TODO
 
