@@ -39,6 +39,7 @@ t/run.t
 t/signal.t
 t/timeout.t
 t/timer.t
+t/windows_search_path.t
 t/win32_compile.t
 TODO
 META.yml                                 Module meta-data (added by MakeMaker)
