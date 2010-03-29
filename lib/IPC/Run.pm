@@ -112,7 +112,7 @@ IPC::Run - system() and background procs w/ piping, redirs, ptys (Unix, Win32)
 
 =head1 DESCRIPTION
 
-IPC::Run allows you run and interact with child processes using files, pipes,
+IPC::Run allows you to run and interact with child processes using files, pipes,
 and pseudo-ttys.  Both system()-style and scripted usages are supported and
 may be mixed.  Likewise, functional and OO API styles are both supported and
 may be mixed.
@@ -1005,13 +1005,15 @@ in their exit codes.
 
 =head1 ROUTINES
 
+=over
+
 =cut
 
 use strict;
 use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 BEGIN {
-	$VERSION = '0.86';
+	$VERSION = '0.87';
 	@ISA     = qw{ Exporter };
 
 	## We use @EXPORT for the end user's convenience: there's only one function
@@ -1531,10 +1533,10 @@ sub signal {
 Sends a C<TERM>, waits for all children to exit for up to 30 seconds, then
 sends a C<KILL> to any that survived the C<TERM>.
 
-Will wait for up to 30 more seconds for the OS to sucessfully C<KILL> the
+Will wait for up to 30 more seconds for the OS to successfully C<KILL> the
 processes.
 
-The 30 seconds may be overriden by setting the C<grace> option, this
+The 30 seconds may be overridden by setting the C<grace> option, this
 overrides both timers.
 
 The harness is then cleaned up.
@@ -2862,10 +2864,13 @@ confess "gak!" unless defined $self->{PIPES};
    return $self;
 }
 
+=item adopt
+
+Experimental feature. NOT FUNCTIONAL YET, NEED TO CLOSE FDS BETTER IN CHILDREN.  SEE t/adopt.t for a test suite.
+
+=cut
 
 sub adopt {
-   ## NOT FUNCTIONAL YET, NEED TO CLOSE FDS BETTER IN CHILDREN.  SEE
-   ## t/adopt.t for a test suite.
    my IPC::Run $self = shift;
 
    for my $adoptee ( @_ ) {
@@ -3609,6 +3614,8 @@ use vars (
 
 =back
 
+=back
+
 =head1 FILTERS
 
 These filters are used to modify input our output between a child
@@ -3751,6 +3758,16 @@ sub new_appender($) {
    };
 }
 
+=item new_string_source
+
+TODO: Needs confirmation. Was previously undocumented. in this module.
+
+This is a filter which is exportable. Returns a sub which appends the data passed in to the output buffer and returns 1 if data was appended. 0 if it was an empty string and undef if no data was passed. 
+
+NOTE: Any additional variables passed to new_string_source will be passed to the sub every time it's called and appended to the output. 
+
+=cut
+
 
 sub new_string_source {
    my $ref;
@@ -3787,6 +3804,13 @@ sub new_string_source {
       }
 }
 
+=item new_string_sink
+
+TODO: Needs confirmation. Was previously undocumented.
+
+This is a filter which is exportable. Returns a sub which pops the data out of the input stream and pushes it onto the string.
+
+=cut
 
 sub new_string_sink {
    my ( $string_ref ) = @_;
@@ -4094,7 +4118,7 @@ Support for C<\@sub_cmd> as an argument to a command which
 gets replaced with /dev/fd or the name of a temporary file containing foo's
 output.  This is like <(sub_cmd ...) found in bash and csh (IIRC).
 
-Allow multiple harnesses to be combined as independant sets of processes
+Allow multiple harnesses to be combined as independent sets of processes
 in to one 'meta-harness'.
 
 Allow a harness to be passed in place of an \@cmd.  This would allow

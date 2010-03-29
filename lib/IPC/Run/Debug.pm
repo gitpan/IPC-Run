@@ -25,7 +25,7 @@ IPC::Run::Debug - debugging routines for IPC::Run
 =head1 DESCRIPTION
 
 Controls IPC::Run debugging.  Debugging levels are now set by using words,
-but the numbers shown are still supported for backwards compatability:
+but the numbers shown are still supported for backwards compatibility:
 
    0  none         disabled (special, see below)
    1  basic        what's running
@@ -70,7 +70,7 @@ use strict;
 use Exporter;
 use vars qw{$VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS};
 BEGIN {
-	$VERSION = '0.86';
+	$VERSION = '0.87';
 	@ISA     = qw( Exporter );
 	@EXPORT  = qw(
 		_debug

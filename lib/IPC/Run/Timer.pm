@@ -163,7 +163,7 @@ use Symbol;
 use Exporter;
 use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
 BEGIN {
-	$VERSION   = '0.86';
+	$VERSION   = '0.87';
 	@ISA       = qw( Exporter );
 	@EXPORT_OK = qw(
 		check
@@ -658,6 +658,8 @@ L</is_reset>.
 Note:  Setting the state to 'undef' to expire a timer will not throw an
 exception.
 
+=back
+
 =cut
 
 sub state {
@@ -674,8 +676,6 @@ sub state {
 1;
 
 =pod
-
-=back
 
 =head1 TODO
 

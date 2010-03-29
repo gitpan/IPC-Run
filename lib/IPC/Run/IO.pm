@@ -48,7 +48,7 @@ to do this.>
 =head1 DESCRIPTION
 
 This class and module allows filehandles and filenames to be harnessed for
-I/O when used IPC::Run, independant of anything else IPC::Run is doing
+I/O when used IPC::Run, independent of anything else IPC::Run is doing
 (except that errors & exceptions can affect all things that IPC::Run is
 doing).
 
@@ -82,7 +82,7 @@ use IPC::Run qw( Win32_MODE );
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.86';
+	$VERSION = '0.87';
 	if ( Win32_MODE ) {
 		eval "use IPC::Run::Win32Helper; require IPC::Run::Win32IO; 1"
 		or ( $@ && die ) or die "$!";
@@ -91,6 +91,20 @@ BEGIN {
 
 sub _empty($);
 *_empty = \&IPC::Run::_empty;
+
+=pod
+
+=over
+
+=over
+
+=item new
+
+TODO: Needs more thorough documentation.  Patches welcome.
+
+I think it takes >> or << along with some other data. 
+
+=cut
 
 sub new {
    my $class = shift;
@@ -219,8 +233,6 @@ sub _new_internal {
    return $self;
 }
 
-=pod
-
 =over
 
 =item filename
@@ -311,7 +323,7 @@ sub open {
 =item open_pipe
 
 If this is a redirection IO object, this opens the pipe in a platform
-independant manner.
+independent manner.
 
 =cut
 
@@ -516,6 +528,13 @@ confess "\$self not an IPC::Run::IO" unless UNIVERSAL::isa( $self, "IPC::Run::IO
    push @{$self->{FBUFS}}, $self->{SOURCE};
 }
 
+=item poll
+
+TODO: Needs confirmation that this is correct. Was previously undocumented.
+
+I believe this is polling the IO for new input and then returns undef if there will never be any more input, 0 if there is none now, but there might be in the future, and TRUE if more input was gotten.
+
+=cut
 
 sub poll {
    my IPC::Run::IO $self = shift;
