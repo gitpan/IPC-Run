@@ -1,7 +1,5 @@
 package IPC::Run::IO;
 
-=pod
-
 =head1 NAME
 
 IPC::Run::IO -- I/O channels for IPC::Run.
@@ -57,14 +55,6 @@ doing).
 INCOMPATIBLE CHANGE: due to the awkwardness introduced in ripping pseudohashes
 out of Perl, this class I<no longer> uses the fields pragma.
 
-=head1 TODO
-
-Implement bidirectionality.
-
-=head1 AUTHOR
-
-Barrie Slaymaker <barries@slaysys.com>
-
 =cut
 
 ## This class is also used internally by IPC::Run in a very initimate way,
@@ -82,7 +72,7 @@ use IPC::Run qw( Win32_MODE );
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.87';
+	$VERSION = '0.88';
 	if ( Win32_MODE ) {
 		eval "use IPC::Run::Win32Helper; require IPC::Run::Win32IO; 1"
 		or ( $@ && die ) or die "$!";
@@ -92,17 +82,15 @@ BEGIN {
 sub _empty($);
 *_empty = \&IPC::Run::_empty;
 
-=pod
+=head1 SUBROUTINES
 
-=over
-
-=over
+=over 4
 
 =item new
 
-TODO: Needs more thorough documentation.  Patches welcome.
+I think it takes >> or << along with some other data.
 
-I think it takes >> or << along with some other data. 
+TODO: Needs more thorough documentation. Patches welcome.
 
 =cut
 
@@ -233,8 +221,6 @@ sub _new_internal {
    return $self;
 }
 
-=over
-
 =item filename
 
 Gets/sets the filename.  Returns the value after the name change, if
@@ -247,8 +233,6 @@ sub filename {
    $self->{FILENAME} = shift if @_;
    return $self->{FILENAME};
 }
-
-=pod
 
 =item init
 
@@ -419,8 +403,6 @@ sub fileno {
    return $fd;
 }
 
-=pod
-
 =item mode
 
 Returns the operator in terms of 'r', 'w', and 'a'.  There is a state
@@ -569,19 +551,34 @@ sub _do_filters {
    my ( $saved_op, $saved_num ) =($IPC::Run::filter_op,$IPC::Run::filter_num);
    $IPC::Run::filter_op = $self;
    $IPC::Run::filter_num = -1;
-   my $c = 0;
+   my $redos = 0;
    my $r;
    {
 	   $@ = '';
 	   $r = eval { IPC::Run::get_more_input(); };
-	   $c++;
-	   ##$@ and warn "redo ", substr($@, 0, 20) , " ";
-	   (($c < 200) and ($@||'')=~ m/^Resource temporarily/) and redo;
+
+	   # Detect Resource temporarily unavailable and re-try to a point (200 or 2 seconds),  assuming select behaves (which it doesn't always? need ref)
+	   if($@ && $@ =~ m/^Resource temporarily/ && $redos++ < 200) {
+	       select(undef, undef, undef, 0.01);
+	       redo;
+	   }
    }
    ( $IPC::Run::filter_op, $IPC::Run::filter_num ) = ( $saved_op, $saved_num );
    $self->{HARNESS} = undef;
    die "ack ", $@ if $@;
    return $r;
 }
+
+=back
+
+=head1 AUTHOR
+
+Barrie Slaymaker <barries@slaysys.com>
+
+=head1 TODO
+
+Implement bidirectionality.
+
+=cut
 
 1;
