@@ -44,3 +44,4 @@ t/windows_search_path.t
 t/win32_compile.t
 TODO
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
