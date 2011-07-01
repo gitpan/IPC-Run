@@ -1,4 +1,5 @@
 package IPC::Run;
+use bytes;
 
 =pod
 
@@ -1013,7 +1014,7 @@ use strict;
 use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 BEGIN {
-	$VERSION = '0.90_02';
+	$VERSION = '0.90_03';
 	@ISA     = qw{ Exporter };
 
 	## We use @EXPORT for the end user's convenience: there's only one function
@@ -1073,6 +1074,16 @@ sub input_avail();
 sub get_more_input();
 
 ###############################################################################
+
+##
+## Error constants, not too locale-dependant
+use vars  qw( $_EIO $_EAGAIN );
+use Errno qw(   EIO   EAGAIN );
+BEGIN {
+  local $!;
+  $! = EIO;    $_EIO    = qr/^$!/;
+  $! = EAGAIN; $_EAGAIN = qr/^$!/;
+}
 
 ##
 ## State machine states, set in $self->{STATE}
@@ -2405,7 +2416,7 @@ sub _open_pipes {
 	       ## read() throws the bad file descriptor message if the
 	       ## kid dies on Win32.
                die $@ unless
-	          $@ =~ /^Input\/output error: read/ ||
+	          $@ =~ $_EIO ||
 		  ($@ =~ /input or output/ && $^O =~ /aix/) 
 		  || ( Win32_MODE && $@ =~ /Bad file descriptor/ );
             }

@@ -72,7 +72,7 @@ use IPC::Run qw( Win32_MODE );
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.90_02';
+	$VERSION = '0.90_03';
 	if ( Win32_MODE ) {
 		eval "use IPC::Run::Win32Helper; require IPC::Run::Win32IO; 1"
 		or ( $@ && die ) or die "$!";
@@ -557,8 +557,8 @@ sub _do_filters {
 	   $@ = '';
 	   $r = eval { IPC::Run::get_more_input(); };
 
-	   # Detect Resource temporarily unavailable and re-try to a point (200 or 2 seconds),  assuming select behaves (which it doesn't always? need ref)
-	   if($@ && $@ =~ m/^Resource temporarily/ && $redos++ < 200) {
+	   # Detect Resource temporarily unavailable and re-try 200 times (2 seconds),  assuming select behaves (which it doesn't always? need ref)
+	   if(($@||'') =~ $IPC::Run::_EAGAIN && $redos++ < 200) {
 	       select(undef, undef, undef, 0.01);
 	       redo;
 	   }
