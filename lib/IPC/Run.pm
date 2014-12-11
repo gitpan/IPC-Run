@@ -1014,7 +1014,7 @@ use strict;
 use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 BEGIN {
-	$VERSION = '0.92';
+	$VERSION = '0.93';
 	@ISA     = qw{ Exporter };
 
 	## We use @EXPORT for the end user's convenience: there's only one function
@@ -1050,7 +1050,7 @@ use IPC::Run::Debug;
 use Exporter;
 use Fcntl;
 use POSIX ();
-use Symbol;
+BEGIN { if ($] < 5.008) { require Symbol; } }
 use Carp;
 use File::Spec ();
 use IO::Handle;
@@ -1234,7 +1234,6 @@ sub _empty($) { ! ( defined $_[0] && length $_[0] ) }
 ## 'safe' versions of otherwise fun things to do. See also IPC::Run::Win32Helper.
 sub _close {
    confess 'undef' unless defined $_[0];
-   no strict 'refs';
    my $fd = $_[0] =~ /^\d+$/ ? $_[0] : fileno $_[0];
    my $r = POSIX::close $fd;
    $r = $r ? '' : " ERROR $!";
@@ -1281,7 +1280,7 @@ sub _exec {
 #      # old values of $! causing spurious strerr()
 #      # messages to appear in the "Can't exec" message
 #      undef $!;
-      exec @_;
+      exec { $_[0] } @_;
 #   }
 #   croak "$!: exec( " . join( ', ', map "'$_'", @_ ) . " )";
     ## Fall through so $! can be reported to parent.
@@ -2520,22 +2519,27 @@ sub _do_kid_and_exit {
    my IPC::Run $self = shift;
    my ( $kid ) = @_;
 
-   ## For unknown reasons, placing these two statements in the eval{}
-   ## causes the eval {} to not catch errors after they are executed in
-   ## perl 5.6.0, godforsaken version that it is...not sure about 5.6.1.
-   ## Part of this could be that these symbols get destructed when
-   ## exiting the eval, and that destruction might be what's (wrongly)
-   ## confusing the eval{}, allowing the exception to probpogate.
-   my $s1 = gensym;
-   my $s2 = gensym;
+   my ( $s1, $s2 );
+   if ($] < 5.008) {
+     ## For unknown reasons, placing these two statements in the eval{}
+     ## causes the eval {} to not catch errors after they are executed in
+     ## perl 5.6.0, godforsaken version that it is...not sure about 5.6.1.
+     ## Part of this could be that these symbols get destructed when
+     ## exiting the eval, and that destruction might be what's (wrongly)
+     ## confusing the eval{}, allowing the exception to probpogate.
+     $s1 = Symbol::gensym();
+     $s2 = Symbol::gensym();
+   }
 
    eval {
       local $cur_self = $self;
 
-      _set_child_debug_name( ref $kid->{VAL} eq "CODE"
-	 ? "CODE"
-	 : basename( $kid->{VAL}->[0] )
-      );
+      if ( _debugging ) {
+         _set_child_debug_name( ref $kid->{VAL} eq "CODE"
+         	 ? "CODE"
+         	 : basename( $kid->{VAL}->[0] )
+         );
+      }
 
       ## close parent FD's first so they're out of the way.
       ## Don't close STDIN, STDOUT, STDERR: they should be inherited or
@@ -2640,9 +2644,10 @@ sub _do_kid_and_exit {
 	    fcntl $s2, F_SETFD, 1;
 	 }
 
-	 my @cmd = ( $kid->{PATH}, @{$kid->{VAL}}[1..$#{$kid->{VAL}}] );
-	 _debug 'execing ', join " ", map { /[\s\"]/ ? "'$_'" : $_ } @cmd
-	    if _debugging;
+	 if ( _debugging ) {
+	    my @cmd = ( $kid->{PATH}, @{$kid->{VAL}}[1..$#{$kid->{VAL}}] );
+	    _debug 'execing ', join " ", map { /[\s\"]/ ? "'$_'" : $_ } @cmd;
+	 }
 
 	 die "exec failed: simulating exec() failure"
 	    if $self->{_simulate_exec_failure};
