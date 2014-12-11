@@ -41,7 +41,7 @@
          }
       }
    },
-   "release_status" : "stable",
+   "release_status" : "testing",
    "resources" : {
       "bugtracker" : {
          "web" : "https://rt.cpan.org/NoAuth/Bugs.html?Dist=IPC-Run"
@@ -53,5 +53,5 @@
          "url" : "https://github.com/toddr/IPC-Run"
       }
    },
-   "version" : "0.93"
+   "version" : "0.93_01"
 }
